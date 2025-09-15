@@ -1,0 +1,172 @@
+﻿<Window x:Class="Osadka.Views.VectorDisplaySettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Osadka.Views"
+        mc:Ignorable="d"
+        Title="Настройки отображения" Height="640" Width="760" WindowStartupLocation="CenterOwner">
+
+    <Window.Resources>
+        <local:ColorToHexConverter x:Key="ColorToHex"/>
+        <Style TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="0,2,0,0"/>
+        </Style>
+        <Style TargetType="Slider">
+            <Setter Property="Margin" Value="0,2,0,0"/>
+        </Style>
+        <Style TargetType="GroupBox">
+            <Setter Property="Margin" Value="8,8,8,0"/>
+            <Setter Property="Padding" Value="8"/>
+        </Style>
+    </Window.Resources>
+
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="8">
+            <Button Content="Закрыть" Width="120" IsDefault="True" Click="OnCloseClick"/>
+        </StackPanel>
+
+        <ScrollViewer>
+            <StackPanel Margin="8">
+                <GroupBox Header="Общие параметры">
+                    <Grid Margin="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="180"/>
+                            <ColumnDefinition Width="90"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Толщина линии (px)"/>
+                        <Slider Grid.Column="1" Minimum="0.5" Maximum="8" Value="{Binding VectorSettings.LineThickness, Mode=TwoWay}"/>
+                        <TextBox Grid.Column="2" Text="{Binding VectorSettings.LineThickness, Mode=TwoWay, StringFormat=F1}"/>
+
+                        <TextBlock Grid.Row="1" Text="Размер наконечника (px)"/>
+                        <Slider Grid.Row="1" Grid.Column="1" Minimum="4" Maximum="200" Value="{Binding VectorSettings.ArrowHeadSize, Mode=TwoWay}"/>
+                        <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding VectorSettings.ArrowHeadSize, Mode=TwoWay, StringFormat=F0}"/>
+
+                        <CheckBox Grid.Row="2" Content="Подписи точек" IsChecked="{Binding VectorSettings.ShowLabels, Mode=TwoWay}"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="Шрифт:" HorizontalAlignment="Right" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding VectorSettings.LabelFontSize, Mode=TwoWay, StringFormat=F0}"/>
+
+                        <TextBlock Grid.Row="3" Text="Прозрачность подложки"/>
+                        <Slider Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="1" TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                Value="{Binding VectorSettings.BackgroundOpacity, Mode=TwoWay}"/>
+                        <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding VectorSettings.BackgroundOpacity, Mode=TwoWay, StringFormat=F2}"/>
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Header="Вектора: масштаб и вес">
+                    <Grid Margin="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="180"/>
+                            <ColumnDefinition Width="90"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Базовый множитель (мир)"/>
+                        <Slider Grid.Column="1" Minimum="0.01" Maximum="10" TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                Value="{Binding VectorSettings.VectorScaleBase, Mode=TwoWay}"/>
+                        <TextBox Grid.Column="2" Text="{Binding VectorSettings.VectorScaleBase, Mode=TwoWay, StringFormat=F2}"/>
+
+                        <CheckBox Grid.Row="1" Content="Вес по величине (нормировка к максимуму)"
+                                  IsChecked="{Binding VectorSettings.UseRelativeWeight, Mode=TwoWay}"/>
+
+                        <TextBlock Grid.Row="2" Text="Степень веса (γ)"/>
+                        <Slider Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="2" TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                Value="{Binding VectorSettings.WeightExponent, Mode=TwoWay}"/>
+                        <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding VectorSettings.WeightExponent, Mode=TwoWay, StringFormat=F2}"/>
+
+                        <TextBlock Grid.Row="3" Text="Мин. длина стрелки (px)"/>
+                        <Slider Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="200" TickFrequency="1" IsSnapToTickEnabled="True"
+                                Value="{Binding VectorSettings.MinArrowPx, Mode=TwoWay}"/>
+                        <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding VectorSettings.MinArrowPx, Mode=TwoWay, StringFormat=F0}"/>
+
+                        <TextBlock Grid.Row="4" Text="Макс. длина стрелки (px)"/>
+                        <Slider Grid.Row="4" Grid.Column="1" Minimum="0" Maximum="2000" TickFrequency="10" IsSnapToTickEnabled="True"
+                                Value="{Binding VectorSettings.MaxArrowPx, Mode=TwoWay}"/>
+                        <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding VectorSettings.MaxArrowPx, Mode=TwoWay, StringFormat=F0}"/>
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Header="Заливка и штриховка">
+                    <Grid Margin="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="180"/>
+                            <ColumnDefinition Width="90"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Прозрачность заливки"/>
+                        <Slider Grid.Column="1" Minimum="0" Maximum="1" TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                Value="{Binding VectorSettings.FillOpacity, Mode=TwoWay}"/>
+                        <TextBox Grid.Column="2" Text="{Binding VectorSettings.FillOpacity, Mode=TwoWay, StringFormat=F2}"/>
+
+                        <TextBlock Grid.Row="1" Text="Шаг штриха (px)"/>
+                        <Slider Grid.Row="1" Grid.Column="1" Minimum="4" Maximum="40" TickFrequency="1" IsSnapToTickEnabled="True"
+                                Value="{Binding VectorSettings.HatchSpacingPx, Mode=TwoWay}"/>
+                        <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding VectorSettings.HatchSpacingPx, Mode=TwoWay, StringFormat=F0}"/>
+
+                        <TextBlock Grid.Row="2" Text="Угол штриха (°)"/>
+                        <Slider Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="180" TickFrequency="5" IsSnapToTickEnabled="True"
+                                Value="{Binding VectorSettings.HatchAngleDeg, Mode=TwoWay}"/>
+                        <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding VectorSettings.HatchAngleDeg, Mode=TwoWay, StringFormat=F0}"/>
+
+                        <TextBlock Grid.Row="3" Text="Прозрачность штриха"/>
+                        <Slider Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="1" TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                Value="{Binding VectorSettings.HatchOpacity, Mode=TwoWay}"/>
+                        <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding VectorSettings.HatchOpacity, Mode=TwoWay, StringFormat=F2}"/>
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Header="Цвета">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Content="Один цвет для всех" IsChecked="{Binding VectorSettings.UseSingleColor, Mode=TwoWay}"/>
+                            <Rectangle Width="24" Height="18" Stroke="Black" Margin="12,2,6,0" Fill="{Binding VectorSettings.SingleColor}"/>
+                            <TextBox Width="90" Text="{Binding VectorSettings.SingleColor, Mode=TwoWay, Converter={StaticResource ColorToHex}}"/>
+                        </StackPanel>
+
+                        <DataGrid ItemsSource="{Binding VectorSettings.CycleStyles}" AutoGenerateColumns="False" CanUserAddRows="False"
+                                  Margin="0,6,0,0" HeadersVisibility="Column">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Цикл" Binding="{Binding CycleId}" Width="*" IsReadOnly="True"/>
+                                <DataGridTemplateColumn Header="Цвет (#RRGGBB)" Width="2*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Rectangle Width="24" Height="18" Stroke="Black" Margin="0,0,6,0" Fill="{Binding Color}"/>
+                                                <TextBox Width="90" Text="{Binding Color, Mode=TwoWay, Converter={StaticResource ColorToHex}}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>
