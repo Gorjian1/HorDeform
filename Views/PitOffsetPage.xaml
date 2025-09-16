@@ -336,8 +336,20 @@
                             <TextBlock Text="{Binding BuildRmsInfo}" Margin="6,0,0,0" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-                            <ToggleButton Content="Точка" IsChecked="{Binding IsToolPoint, Mode=TwoWay}" Width="110"/>
-                            <ToggleButton Content="Прямоугольник" IsChecked="{Binding IsToolRect, Mode=TwoWay}" Width="140" Margin="6,0,0,0"/>
+                            <ToggleButton ToolTip="Точка" IsChecked="{Binding IsToolPoint, Mode=TwoWay}" Padding="6">
+                                <TextBlock Text="&#xE81A;"
+                                           FontFamily="Segoe MDL2 Assets"
+                                           FontSize="20"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </ToggleButton>
+                            <ToggleButton ToolTip="Прямоугольник" IsChecked="{Binding IsToolRect, Mode=TwoWay}" Margin="6,0,0,0" Padding="6">
+                                <TextBlock Text="&#xE71A;"
+                                           FontFamily="Segoe MDL2 Assets"
+                                           FontSize="20"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </ToggleButton>
                             <Button Content="Построить" Command="{Binding BuildCommand}" Margin="12,0,0,0"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
