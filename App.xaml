@@ -5,11 +5,19 @@
 
     <Application.Resources>
 
+        <!-- Brand palette -->
+        <Color x:Key="BrandPrimaryColor">#FFC24E3A</Color>
+        <Color x:Key="BrandPrimaryColorDark">#FF8F3A2B</Color>
+        <SolidColorBrush x:Key="BrandPrimaryBrush" Color="{StaticResource BrandPrimaryColor}"/>
+        <SolidColorBrush x:Key="BrandPrimaryBrushDark" Color="{StaticResource BrandPrimaryColorDark}"/>
+        <SolidColorBrush x:Key="BrandSurfaceBrush" Color="#FFFDF9F7"/>
+        <SolidColorBrush x:Key="BrandSurfaceBorderBrush" Color="#FFD9A39A"/>
+
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <conv:PositiveToVisibleConverter x:Key="PositiveToVisible"/>
         <conv:ZeroToVisibleConverter     x:Key="ZeroToVisible"/>
         <conv:JoinConverter x:Key="Join"/>
         <conv:RelaxedDoubleConverter x:Key="RelaxedDouble"/>
-        
+
     </Application.Resources>
 </Application>
