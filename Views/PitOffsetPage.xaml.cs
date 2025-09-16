@@ -19,6 +19,8 @@ namespace Osadka.Views
 
             Loaded += OnLoaded;
             Unloaded += OnUnloaded;
+            Loaded += OnLoadedHook;
+            Unloaded += OnUnloadedHook;
         }
 
         private void OnLoaded(object? sender, RoutedEventArgs e)
