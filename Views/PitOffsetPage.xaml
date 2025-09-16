@@ -4,6 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="clr-namespace:Osadka.Views"
+             xmlns:ctrls="clr-namespace:Osadka.Controls"
              mc:Ignorable="d"
              d:DesignHeight="720" d:DesignWidth="1180">
 
@@ -306,26 +307,25 @@
                         <ComboBox ItemsSource="{Binding Objects}" SelectedItem="{Binding SelectedObject}"/>
 
                         <TextBlock Text="Циклы (включаемые)"/>
-                        <Grid>
-                            <ToggleButton x:Name="CyclesDrop"
-                                          Content="{Binding SelectedCyclesSummary}"
-                                          Padding="6" BorderBrush="#88000000" BorderThickness="1" Background="#FFF"/>
-                            <Popup PlacementTarget="{Binding ElementName=CyclesDrop}"
-                                   IsOpen="{Binding IsChecked, ElementName=CyclesDrop}"
-                                   StaysOpen="False" AllowsTransparency="True">
-                                <Border Background="White" BorderBrush="#88000000" BorderThickness="1" Padding="6" CornerRadius="6">
-                                    <ScrollViewer Height="220" Width="300">
-                                        <ItemsControl ItemsSource="{Binding Cycles}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Content="{Binding Id}" Margin="0,4,0,0"/>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </ScrollViewer>
-                                </Border>
-                            </Popup>
-                        </Grid>
+                        <ctrls:CheckComboBox ItemsSource="{Binding Cycles}"
+                                             Text="{Binding SelectedCyclesSummary, Mode=OneWay}"
+                                             IsEditable="True"
+                                             IsReadOnly="True"
+                                             StaysOpenOnEdit="True"
+                                             Padding="6"
+                                             BorderBrush="#88000000"
+                                             BorderThickness="1"
+                                             Background="White"
+                                             Width="300"
+                                             MaxDropDownHeight="220">
+                            <ctrls:CheckComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                              Content="{Binding Id}"
+                                              Margin="0,4,0,0"/>
+                                </DataTemplate>
+                            </ctrls:CheckComboBox.ItemTemplate>
+                        </ctrls:CheckComboBox>
 
                         <Separator Margin="8,10"/>
 
