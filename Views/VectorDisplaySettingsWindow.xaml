@@ -144,7 +144,10 @@
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <CheckBox Content="Один цвет для всех" IsChecked="{Binding VectorSettings.UseSingleColor, Mode=TwoWay}"/>
-                            <Rectangle Width="24" Height="18" Stroke="Black" Margin="12,2,6,0" Fill="{Binding VectorSettings.SingleColor}"/>
+                            <Rectangle Width="24" Height="18" Stroke="Black" Margin="12,2,4,0" Fill="{Binding VectorSettings.SingleColor}"/>
+                            <Button Width="32" Height="24" Margin="0,0,6,0" Click="OnPickSingleColorClick" ToolTip="Выбрать цвет">
+                                <TextBlock Text="&#xE790;" FontFamily="Segoe MDL2 Assets" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Button>
                             <TextBox Width="90" Text="{Binding VectorSettings.SingleColor, Mode=TwoWay, Converter={StaticResource ColorToHex}}"/>
                         </StackPanel>
 
@@ -156,7 +159,10 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
-                                                <Rectangle Width="24" Height="18" Stroke="Black" Margin="0,0,6,0" Fill="{Binding Color}"/>
+                                                <Rectangle Width="24" Height="18" Stroke="Black" Margin="0,0,4,0" Fill="{Binding Color}"/>
+                                                <Button Width="28" Height="24" Margin="0,0,6,0" Click="OnPickCycleColorClick" ToolTip="Выбрать цвет">
+                                                    <TextBlock Text="&#xE790;" FontFamily="Segoe MDL2 Assets" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Button>
                                                 <TextBox Width="90" Text="{Binding Color, Mode=TwoWay, Converter={StaticResource ColorToHex}}"/>
                                             </StackPanel>
                                         </DataTemplate>

@@ -9,11 +9,6 @@
              d:DesignHeight="720" d:DesignWidth="1180">
 
     <UserControl.Resources>
-        <!-- Проекции/стрелки с поддержкой веса -->
-        <local:ToScreenConverter x:Key="ToScreen"/>
-        <local:VectorEndWeightedConverter x:Key="VectorEndW"/>
-        <local:ArrowHeadPointsWeightedConverter x:Key="HeadW"/>
-
         <!-- Цвета/штрих/видимость -->
         <local:CycleColorFromSettingsConverter x:Key="CycleColorFromSettingsConverter"/>
         <local:CycleHatchMultiConverter x:Key="CycleHatchConverter"/>
@@ -81,38 +76,33 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
-                                    <Polygon Points="{Binding Points}"
-                                             Visibility="{Binding HasFill, Converter={StaticResource BoolToVis}}"
-                                             StrokeThickness="2"
-                                             Opacity="{Binding DataContext.VectorSettings.FillOpacity, RelativeSource={RelativeSource AncestorType=UserControl}}">
-                                        <Polygon.Stroke>
-                                            <MultiBinding Converter="{StaticResource CycleColorFromSettingsConverter}">
-                                                <Binding Path="CycleId"/>
-                                                <Binding Path="DataContext.VectorSettings" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.VectorSettings.Version" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                            </MultiBinding>
-                                        </Polygon.Stroke>
-                                        <Polygon.Fill>
+                                    <Path Data="{Binding FillGeometry}"
+                                          Visibility="{Binding HasFill, Converter={StaticResource BoolToVis}}"
+                                          StrokeThickness="0">
+                                        <Path.Fill>
                                             <MultiBinding Converter="{StaticResource CycleHatchConverter}">
                                                 <Binding Path="CycleId"/>
                                                 <Binding Path="DataContext.VectorSettings" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
                                                 <Binding Path="DataContext.VectorSettings.Version" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
                                             </MultiBinding>
-                                        </Polygon.Fill>
-                                    </Polygon>
+                                        </Path.Fill>
+                                    </Path>
 
-                                    <!-- Фоллбек: нет площади -->
-                                    <Polyline Points="{Binding Points}"
-                                              Visibility="{Binding HasFill, Converter={StaticResource NotBoolToVis}}"
-                                              StrokeThickness="2">
-                                        <Polyline.Stroke>
+                                    <Path Data="{Binding StrokeGeometry}"
+                                          Visibility="{Binding HasStroke, Converter={StaticResource BoolToVis}}"
+                                          Fill="Transparent"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round"
+                                          StrokeLineJoin="Round"
+                                          StrokeThickness="{Binding DataContext.VectorSettings.LineThickness, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                        <Path.Stroke>
                                             <MultiBinding Converter="{StaticResource CycleColorFromSettingsConverter}">
                                                 <Binding Path="CycleId"/>
                                                 <Binding Path="DataContext.VectorSettings" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
                                                 <Binding Path="DataContext.VectorSettings.Version" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
                                             </MultiBinding>
-                                        </Polyline.Stroke>
-                                    </Polyline>
+                                        </Path.Stroke>
+                                    </Path>
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
@@ -128,7 +118,10 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Canvas>
-                                    <Line StrokeThickness="{Binding DataContext.VectorSettings.LineThickness, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                    <Line StrokeThickness="{Binding DataContext.VectorSettings.LineThickness, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round"
+                                          Visibility="{Binding HasVector, Converter={StaticResource BoolToVis}}">
                                         <Line.Stroke>
                                             <MultiBinding Converter="{StaticResource CycleColorFromSettingsConverter}">
                                                 <Binding Path="CycleId"/>
@@ -137,59 +130,23 @@
                                             </MultiBinding>
                                         </Line.Stroke>
 
-                                        <!-- начало -->
                                         <Line.X1>
-                                            <MultiBinding Converter="{StaticResource ToScreen}" ConverterParameter="x">
-                                                <Binding Path="X"/>
-                                                <Binding Path="Y"/>
-                                                <Binding Path="DataContext.Scale" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.OffsetX" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.OffsetY" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.RotationDeg" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                            </MultiBinding>
+                                            <Binding Path="ScreenX"/>
                                         </Line.X1>
                                         <Line.Y1>
-                                            <MultiBinding Converter="{StaticResource ToScreen}" ConverterParameter="y">
-                                                <Binding Path="X"/>
-                                                <Binding Path="Y"/>
-                                                <Binding Path="DataContext.Scale" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.OffsetX" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.OffsetY" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.RotationDeg" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                            </MultiBinding>
+                                            <Binding Path="ScreenY"/>
                                         </Line.Y1>
-
-                                        <!-- конец с весом -->
                                         <Line.X2>
-                                            <MultiBinding Converter="{StaticResource VectorEndW}" ConverterParameter="x">
-                                                <Binding Path="."/>
-                                                <Binding Path="DataContext.Scale" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.OffsetX" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.OffsetY" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.VectorSettings.VectorScaleBase" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.RotationDeg" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.MaxVVisible" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.VectorSettings" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.VectorSettings.Version" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                            </MultiBinding>
+                                            <Binding Path="ArrowEndX"/>
                                         </Line.X2>
                                         <Line.Y2>
-                                            <MultiBinding Converter="{StaticResource VectorEndW}" ConverterParameter="y">
-                                                <Binding Path="."/>
-                                                <Binding Path="DataContext.Scale" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.OffsetX" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.OffsetY" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.VectorSettings.VectorScaleBase" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.RotationDeg" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.MaxVVisible" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.VectorSettings" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.VectorSettings.Version" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                            </MultiBinding>
+                                            <Binding Path="ArrowEndY"/>
                                         </Line.Y2>
                                     </Line>
 
                                     <!-- наконечник -->
-                                    <Polygon>
+                                    <Polygon Points="{Binding ArrowHead}"
+                                             Visibility="{Binding HasVector, Converter={StaticResource BoolToVis}}">
                                         <Polygon.Fill>
                                             <MultiBinding Converter="{StaticResource CycleColorFromSettingsConverter}">
                                                 <Binding Path="CycleId"/>
@@ -197,20 +154,6 @@
                                                 <Binding Path="DataContext.VectorSettings.Version" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
                                             </MultiBinding>
                                         </Polygon.Fill>
-                                        <Polygon.Points>
-                                            <MultiBinding Converter="{StaticResource HeadW}">
-                                                <Binding Path="."/>
-                                                <Binding Path="DataContext.Scale" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.OffsetX" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.OffsetY" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.VectorSettings.VectorScaleBase" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.VectorSettings.ArrowHeadSize" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.RotationDeg" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.MaxVVisible" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.VectorSettings" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.VectorSettings.Version" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                            </MultiBinding>
-                                        </Polygon.Points>
                                     </Polygon>
 
                                     <!-- подпись -->
@@ -218,22 +161,10 @@
                                                FontSize="{Binding DataContext.VectorSettings.LabelFontSize, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                Visibility="{Binding DataContext.VectorSettings.ShowLabels, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}">
                                         <Canvas.Left>
-                                            <MultiBinding Converter="{StaticResource ToScreen}" ConverterParameter="x">
-                                                <Binding Path="X"/><Binding Path="Y"/>
-                                                <Binding Path="DataContext.Scale" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.OffsetX" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.OffsetY" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.RotationDeg" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                            </MultiBinding>
+                                            <Binding Path="LabelX"/>
                                         </Canvas.Left>
                                         <Canvas.Top>
-                                            <MultiBinding Converter="{StaticResource ToScreen}" ConverterParameter="y">
-                                                <Binding Path="X"/><Binding Path="Y"/>
-                                                <Binding Path="DataContext.Scale" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.OffsetX" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.OffsetY" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                                <Binding Path="DataContext.RotationDeg" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                                            </MultiBinding>
+                                            <Binding Path="LabelY"/>
                                         </Canvas.Top>
                                     </TextBlock>
                                 </Canvas>
