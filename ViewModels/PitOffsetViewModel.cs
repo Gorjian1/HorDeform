@@ -9,7 +9,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
@@ -67,9 +66,7 @@ namespace Osadka.ViewModels
         // Команды
         public IRelayCommand LoadBackgroundCommand { get; }
         public IRelayCommand ClearBackgroundCommand { get; }
-        public IRelayCommand ExportCsvCommand { get; }
-        public IRelayCommand ExportCanvasPngCommand { get; }
-        public IRelayCommand ExportAllCommand { get; }
+        public IRelayCommand ExportPngCommand { get; }
         public IRelayCommand RefreshCommand { get; }
 
         public IRelayCommand BuildCommand { get; }
@@ -92,9 +89,7 @@ namespace Osadka.ViewModels
 
             LoadBackgroundCommand = new RelayCommand(LoadBackground);
             ClearBackgroundCommand = new RelayCommand(() => { BackgroundImage = null; BackgroundPath = null; });
-            ExportCsvCommand = new RelayCommand(ExportCsv);
-            ExportCanvasPngCommand = new RelayCommand(() => OnExportRequested?.Invoke(this, EventArgs.Empty));
-            ExportAllCommand = new RelayCommand(ExportAll);
+            ExportPngCommand = new RelayCommand(() => OnExportRequested?.Invoke(this, EventArgs.Empty));
             RefreshCommand = new RelayCommand(() => { RebuildRows(); RebuildCycleOverlays(); });
 
             BuildCommand = new RelayCommand(EnterBuildMode);
@@ -473,24 +468,6 @@ namespace Osadka.ViewModels
                 }
                 BackgroundImage = img;
             }
-        }
-
-        private void ExportCsv()
-        {
-            var dlg = new SaveFileDialog { Filter = "CSV|*.csv", FileName = "pit-offset.csv" };
-            if (dlg.ShowDialog() != true) return;
-
-            var sb = new StringBuilder();
-            sb.AppendLine("Cycle;N;X;Y;V;Dx;Dy");
-            foreach (var r in Rows)
-                sb.AppendLine($"{r.CycleId};{r.N};{r.X?.ToString(CultureInfo.InvariantCulture)};{r.Y?.ToString(CultureInfo.InvariantCulture)};{r.V?.ToString(CultureInfo.InvariantCulture)};{r.Dx?.ToString(CultureInfo.InvariantCulture)};{r.Dy?.ToString(CultureInfo.InvariantCulture)}");
-            File.WriteAllText(dlg.FileName, sb.ToString(), Encoding.UTF8);
-        }
-
-        private void ExportAll()
-        {
-            OnExportRequested?.Invoke(this, EventArgs.Empty);
-            ExportCsv();
         }
 
         // == Подгонка преобразования ==

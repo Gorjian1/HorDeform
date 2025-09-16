@@ -372,7 +372,7 @@
                         <Separator Margin="8,10"/>
 
                         <TextBlock Text="Экспорт" FontWeight="Bold"/>
-                        <Button Content="Экспорт всего (PNG+CSV)" Command="{Binding ExportAllCommand}"/>
+                        <Button Content="Экспорт PNG" Command="{Binding ExportPngCommand}"/>
                     </StackPanel>
                 </ScrollViewer>
             </Border>
