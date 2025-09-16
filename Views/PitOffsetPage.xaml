@@ -35,18 +35,41 @@
         </Style>
         <Style TargetType="Button">
             <Setter Property="Margin" Value="0,6,0,0"/>
+            <Setter Property="MinWidth" Value="36"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="IconButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Width" Value="36"/>
+            <Setter Property="MinWidth" Value="36"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+        <Style TargetType="ToggleButton">
+            <Setter Property="Margin" Value="0,6,0,0"/>
             <Setter Property="MinWidth" Value="120"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
         <Style TargetType="ComboBox">
-            <Setter Property="Margin" Value="0,2,0,0"/>
-            <Setter Property="MinWidth" Value="120"/>
+            <Setter Property="Margin" Value="0,6,0,0"/>
+            <Setter Property="MinWidth" Value="160"/>
+            <Setter Property="Height" Value="36"/>
         </Style>
         <Style TargetType="TextBox">
-            <Setter Property="Margin" Value="0,2,0,0"/>
+            <Setter Property="Margin" Value="0,4,0,0"/>
             <Setter Property="MinWidth" Value="90"/>
+            <Setter Property="Height" Value="32"/>
         </Style>
         <Style TargetType="Slider">
-            <Setter Property="Margin" Value="0,2,0,0"/>
+            <Setter Property="Margin" Value="0,6,0,0"/>
+        </Style>
+        <Style TargetType="GroupBox">
+            <Setter Property="Margin" Value="0,10,0,0"/>
+            <Setter Property="Padding" Value="10"/>
         </Style>
     </UserControl.Resources>
 
@@ -302,77 +325,102 @@
                     <StackPanel>
                         <TextBlock Text="Окно взаимодействия" FontWeight="Bold" FontSize="16" Margin="0,0,0,8"/>
 
-                        <TextBlock Text="Объект"/>
-                        <ComboBox ItemsSource="{Binding Objects}" SelectedItem="{Binding SelectedObject}"/>
+                        <GroupBox Header="Объект" Margin="0">
+                            <StackPanel>
+                                <ComboBox ItemsSource="{Binding Objects}" SelectedItem="{Binding SelectedObject}" Margin="0"/>
+                            </StackPanel>
+                        </GroupBox>
 
-                        <TextBlock Text="Циклы (включаемые)"/>
-                        <Grid>
-                            <ToggleButton x:Name="CyclesDrop"
-                                          Content="{Binding SelectedCyclesSummary}"
-                                          Padding="6" BorderBrush="#88000000" BorderThickness="1" Background="#FFF"/>
-                            <Popup PlacementTarget="{Binding ElementName=CyclesDrop}"
-                                   IsOpen="{Binding IsChecked, ElementName=CyclesDrop}"
-                                   StaysOpen="False" AllowsTransparency="True">
-                                <Border Background="White" BorderBrush="#88000000" BorderThickness="1" Padding="6" CornerRadius="6">
-                                    <ScrollViewer Height="220" Width="300">
-                                        <ItemsControl ItemsSource="{Binding Cycles}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Content="{Binding Id}" Margin="0,4,0,0"/>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </ScrollViewer>
-                                </Border>
-                            </Popup>
-                        </Grid>
+                        <GroupBox Header="Циклы (включаемые)">
+                            <Grid>
+                                <ToggleButton x:Name="CyclesDrop"
+                                              Content="{Binding SelectedCyclesSummary}"
+                                              Margin="0"
+                                              Padding="6" BorderBrush="#88000000" BorderThickness="1" Background="#FFF"/>
+                                <Popup PlacementTarget="{Binding ElementName=CyclesDrop}"
+                                       IsOpen="{Binding IsChecked, ElementName=CyclesDrop}"
+                                       StaysOpen="False" AllowsTransparency="True">
+                                    <Border Background="White" BorderBrush="#88000000" BorderThickness="1" Padding="6" CornerRadius="6">
+                                        <ScrollViewer Height="220" Width="300">
+                                            <ItemsControl ItemsSource="{Binding Cycles}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Content="{Binding Id}" Margin="0,4,0,0"/>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                        </GroupBox>
 
-                        <Separator Margin="8,10"/>
+                        <GroupBox Header="Построение контуров и векторов">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0">
+                                    <TextBlock Text="Статус:"/>
+                                    <TextBlock Text="{Binding BuildRmsInfo}" Margin="6,0,0,0" FontWeight="SemiBold"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                    <ToggleButton Content="Точка" IsChecked="{Binding IsToolPoint, Mode=TwoWay}" Width="110" Margin="0"/>
+                                    <ToggleButton Content="Прямоугольник" IsChecked="{Binding IsToolRect, Mode=TwoWay}" Width="140" Margin="6,0,0,0"/>
+                                    <Button Content="Построить" Command="{Binding BuildCommand}" Margin="12,0,0,0"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                    <Button Content="Применить" Command="{Binding AcceptBuildCommand}" Margin="0"/>
+                                    <Button Content="Очистить" Command="{Binding ClearAnchorsCommand}" Margin="6,0,0,0"/>
+                                    <Button Content="Отмена" Command="{Binding CancelBuildCommand}" Margin="6,0,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
 
-                        <!-- ПАНЕЛЬ ПОСТРОЕНИЯ -->
-                        <TextBlock Text="Построение контуров и векторов" FontWeight="Bold"/>
-                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-                            <TextBlock Text="Статус:" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding BuildRmsInfo}" Margin="6,0,0,0" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-                            <ToggleButton Content="Точка" IsChecked="{Binding IsToolPoint, Mode=TwoWay}" Width="110"/>
-                            <ToggleButton Content="Прямоугольник" IsChecked="{Binding IsToolRect, Mode=TwoWay}" Width="140" Margin="6,0,0,0"/>
-                            <Button Content="Построить" Command="{Binding BuildCommand}" Margin="12,0,0,0"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Button Content="Применить" Command="{Binding AcceptBuildCommand}"/>
-                            <Button Content="Очистить" Command="{Binding ClearAnchorsCommand}" Margin="6,0,0,0"/>
-                            <Button Content="Отмена" Command="{Binding CancelBuildCommand}" Margin="6,0,0,0"/>
-                        </StackPanel>
+                        <GroupBox Header="Трансформация">
+                            <StackPanel>
+                                <UniformGrid Columns="3" Margin="0">
+                                    <Button Command="{Binding RotateLeft90Command}" Style="{StaticResource IconButtonStyle}" ToolTip="Повернуть -90°">
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE80D;" FontSize="18"/>
+                                    </Button>
+                                    <Button Command="{Binding ResetTransformCommand}" Style="{StaticResource IconButtonStyle}" ToolTip="Сбросить трансформацию">
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE72C;" FontSize="18"/>
+                                    </Button>
+                                    <Button Command="{Binding RotateRight90Command}" Style="{StaticResource IconButtonStyle}" ToolTip="Повернуть +90°">
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE80C;" FontSize="18"/>
+                                    </Button>
+                                </UniformGrid>
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <TextBlock Text="Поворот (°)" Width="110"/>
+                                    <Slider Minimum="-180" Maximum="180" Value="{Binding RotationDeg}" TickFrequency="15" IsSnapToTickEnabled="True" Width="180" Margin="6,0,0,0"/>
+                                    <TextBox Text="{Binding RotationDeg, StringFormat=F1}" Width="70" Margin="6,0,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
 
-                        <UniformGrid Columns="3" Margin="0,8,0,0">
-                            <Button Content="⟲ Повернуть -90°" Command="{Binding RotateLeft90Command}"/>
-                            <Button Content="Сброс трансформации" Command="{Binding ResetTransformCommand}"/>
-                            <Button Content="Повернуть +90° ⟳" Command="{Binding RotateRight90Command}"/>
-                        </UniformGrid>
+                        <GroupBox Header="Настройки отображения">
+                            <StackPanel Orientation="Horizontal" Margin="0">
+                                <Button Command="{Binding OpenVectorSettingsCommand}" Style="{StaticResource IconButtonStyle}" Margin="0" ToolTip="Открыть настройки отображения">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE713;" FontSize="18"/>
+                                </Button>
+                            </StackPanel>
+                        </GroupBox>
 
-                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                            <TextBlock Text="Поворот (°)" Width="110"/>
-                            <Slider Minimum="-180" Maximum="180" Value="{Binding RotationDeg}" TickFrequency="15" IsSnapToTickEnabled="True" Width="180"/>
-                            <TextBox Text="{Binding RotationDeg, StringFormat=F1}" Width="70" Margin="6,0,0,0"/>
-                        </StackPanel>
+                        <GroupBox Header="Вставка подложки">
+                            <StackPanel Orientation="Horizontal" Margin="0">
+                                <Button Command="{Binding LoadBackgroundCommand}" Style="{StaticResource IconButtonStyle}" Margin="0" ToolTip="Загрузить подложку">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8E5;" FontSize="18"/>
+                                </Button>
+                                <Button Command="{Binding ClearBackgroundCommand}" Style="{StaticResource IconButtonStyle}" Margin="6,0,0,0" ToolTip="Очистить подложку">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8E6;" FontSize="18"/>
+                                </Button>
+                            </StackPanel>
+                        </GroupBox>
 
-                        <Separator Margin="8,10"/>
-
-                        <TextBlock Text="Настройки отображения" FontWeight="Bold"/>
-                        <Button Content="Открыть…" Command="{Binding OpenVectorSettingsCommand}"/>
-
-                        <Separator Margin="8,10"/>
-
-                        <TextBlock Text="Вставка подложки" FontWeight="Bold"/>
-                        <Button Content="Загрузить подложку" Command="{Binding LoadBackgroundCommand}"/>
-                        <Button Content="Очистить подложку" Command="{Binding ClearBackgroundCommand}"/>
-
-                        <Separator Margin="8,10"/>
-
-                        <TextBlock Text="Экспорт" FontWeight="Bold"/>
-                        <Button Content="Экспорт всего (PNG+CSV)" Command="{Binding ExportAllCommand}"/>
+                        <GroupBox Header="Экспорт">
+                            <StackPanel Orientation="Horizontal" Margin="0">
+                                <Button Command="{Binding ExportAllCommand}" Style="{StaticResource IconButtonStyle}" Margin="0" ToolTip="Экспорт всего (PNG+CSV)">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xEDE1;" FontSize="18"/>
+                                </Button>
+                            </StackPanel>
+                        </GroupBox>
                     </StackPanel>
                 </ScrollViewer>
             </Border>
