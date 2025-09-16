@@ -271,7 +271,8 @@ namespace Osadka.ViewModels
 
             try
             {
-                using var wb = new XLWorkbook(dlg.FileName);
+                using var sharedWorkbook = SharedWorkbook.Open(dlg.FileName);
+                var wb = sharedWorkbook.Workbook;
                 var win = new ImportSelectionWindow(wb);
                 if (win.ShowDialog() != true) return;
 
@@ -450,7 +451,8 @@ namespace Osadka.ViewModels
 
             try
             {
-                using var wb = new XLWorkbook(path);
+                using var sharedWorkbook = SharedWorkbook.Open(path);
+                var wb = sharedWorkbook.Workbook;
                 var win = new ImportSelectionWindow(wb);
                 if (win.ShowDialog() != true) return;
 
@@ -585,6 +587,8 @@ namespace Osadka.ViewModels
                         var mr = new MeasurementRow
                         {
                             Id = idText,
+                            Mark = h,
+                            MarkRaw = hRaw,
                             X = x,
                             Y = y,
                             H = h,
@@ -593,7 +597,9 @@ namespace Osadka.ViewModels
                             Dh = dh,
                             Vector = vec,
                             Settl = dh,
+                            SettlRaw = dhRaw,
                             Total = vec,
+                            TotalRaw = vecRaw,
                             Cycle = cycIdx + 1
                         };
 
@@ -683,6 +689,34 @@ namespace Osadka.ViewModels
             value = 0;
             string s = Interaction.InputBox(prompt, "Выбор", min.ToString());
             return int.TryParse(s, out value) && value >= min && value <= max;
+        }
+
+        private sealed class SharedWorkbook : IDisposable
+        {
+            public XLWorkbook Workbook { get; }
+            private readonly FileStream _stream;
+
+            private SharedWorkbook(string path)
+            {
+                _stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+                try
+                {
+                    Workbook = new XLWorkbook(_stream);
+                }
+                catch
+                {
+                    _stream.Dispose();
+                    throw;
+                }
+            }
+
+            public static SharedWorkbook Open(string path) => new SharedWorkbook(path);
+
+            public void Dispose()
+            {
+                Workbook.Dispose();
+                _stream.Dispose();
+            }
         }
     }
 
