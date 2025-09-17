@@ -83,8 +83,7 @@
                                 <Grid>
                                     <Polygon Points="{Binding Points}"
                                              Visibility="{Binding HasFill, Converter={StaticResource BoolToVis}}"
-                                             StrokeThickness="2"
-                                             Opacity="{Binding DataContext.VectorSettings.FillOpacity, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                             StrokeThickness="2">
                                         <Polygon.Stroke>
                                             <MultiBinding Converter="{StaticResource CycleColorFromSettingsConverter}">
                                                 <Binding Path="CycleId"/>
