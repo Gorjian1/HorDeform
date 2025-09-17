@@ -31,6 +31,34 @@ namespace Osadka.Views
         }
     }
 
+    internal static class CycleColorHelper
+    {
+        private static readonly Color[] Palette =
+        {
+            Colors.Red,
+            Colors.Blue,
+            Colors.Green,
+            Colors.Orange,
+            Colors.Purple,
+            Colors.Teal
+        };
+
+        public static Color ResolveColor(int id, global::Osadka.ViewModels.VectorDisplaySettings? settings)
+        {
+            if (settings == null)
+                return Palette[Math.Abs(id) % Palette.Length];
+
+            if (settings.UseSingleColor)
+                return settings.SingleColor;
+
+            var style = settings.CycleStyles.FirstOrDefault(cs => cs.CycleId == id);
+            if (style != null && style.Color != Colors.Transparent)
+                return style.Color;
+
+            return Palette[Math.Abs(id) % Palette.Length];
+        }
+    }
+
     // ===== Экранные координаты начала =====
     public sealed class ToScreenConverter : IMultiValueConverter
     {
@@ -160,18 +188,13 @@ namespace Osadka.Views
     // ===== Цвет цикла из настроек =====
     public sealed class CycleColorFromSettingsConverter : IMultiValueConverter
     {
-        private static readonly Brush[] Palette =
-            { Brushes.Red, Brushes.Blue, Brushes.Green, Brushes.Orange, Brushes.Purple, Brushes.Teal };
-
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             int id = values != null && values.Length > 0 && values[0] is int i ? i : 0;
             var settings = values != null && values.Length > 1 ? values[1] as global::Osadka.ViewModels.VectorDisplaySettings : null;
-            if (settings == null) return Palette[Math.Abs(id) % Palette.Length];
-            if (settings.UseSingleColor) return new SolidColorBrush(settings.SingleColor);
-            var style = settings.CycleStyles.FirstOrDefault(cs => cs.CycleId == id);
-            if (style != null && style.Color != Colors.Transparent) return new SolidColorBrush(style.Color);
-            return Palette[Math.Abs(id) % Palette.Length];
+            var brush = new SolidColorBrush(CycleColorHelper.ResolveColor(id, settings));
+            if (brush.CanFreeze) brush.Freeze();
+            return brush;
         }
         public object[] ConvertBack(object v, Type[] t, object p, CultureInfo c) => new object[] { Binding.DoNothing };
     }
@@ -182,19 +205,26 @@ namespace Osadka.Views
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
+            int cycleId = values != null && values.Length > 0 && values[0] is int id ? id : 0;
             var settings = values != null && values.Length > 1 ? values[1] as global::Osadka.ViewModels.VectorDisplaySettings : null;
-            double spacing = settings?.HatchSpacingPx ?? 12;
-            double opacity = settings?.HatchOpacity ?? 0.6;
-            double angle = settings?.HatchAngleDeg ?? 45;
 
-            var stroke = Brushes.Gray;
-            if (values != null && values.Length > 0 && values[0] is int id)
-            {
-                var pal = new[] { Colors.Red, Colors.Blue, Colors.Green, Colors.Orange, Colors.Purple, Colors.Teal };
-                var c = pal[Math.Abs(id) % pal.Length];
-                stroke = new SolidColorBrush(Color.FromArgb((byte)(opacity * 255), c.R, c.G, c.B));
-            }
-            var pen = new Pen(stroke, 1);
+            double spacing = settings?.HatchSpacingPx ?? 12;
+            if (spacing <= 0) spacing = 1;
+
+            double angle = settings?.HatchAngleDeg ?? 45;
+            double fillOpacity = Math.Clamp(settings?.FillOpacity ?? 0.3, 0.0, 1.0);
+            double hatchOpacity = Math.Clamp(settings?.HatchOpacity ?? 0.6, 0.0, 1.0);
+
+            var color = CycleColorHelper.ResolveColor(cycleId, settings);
+
+            var fillBrush = new SolidColorBrush(color) { Opacity = fillOpacity };
+            if (fillBrush.CanFreeze) fillBrush.Freeze();
+
+            var hatchBrush = new SolidColorBrush(color) { Opacity = hatchOpacity };
+            if (hatchBrush.CanFreeze) hatchBrush.Freeze();
+
+            var pen = new Pen(hatchBrush, 1);
+            if (pen.CanFreeze) pen.Freeze();
 
             var group = new GeometryGroup();
             int lines = 12;
@@ -203,17 +233,39 @@ namespace Osadka.Views
                 double x = i * spacing;
                 group.Children.Add(new LineGeometry(new Point(x, -1000), new Point(x, 1000)));
             }
-            var drawing = new GeometryDrawing(null, pen, group);
-            var brush = new DrawingBrush(drawing)
+            if (group.CanFreeze) group.Freeze();
+
+            var tileRect = new Rect(0, 0, spacing, spacing);
+            var backgroundGeometry = new RectangleGeometry(tileRect);
+            if (backgroundGeometry.CanFreeze) backgroundGeometry.Freeze();
+
+            var background = new GeometryDrawing(fillBrush, null, backgroundGeometry);
+            if (background.CanFreeze) background.Freeze();
+
+            var hatching = new GeometryDrawing(null, pen, group);
+            if (hatching.CanFreeze) hatching.Freeze();
+
+            var drawingGroup = new DrawingGroup();
+            drawingGroup.Children.Add(background);
+            drawingGroup.Children.Add(hatching);
+            if (drawingGroup.CanFreeze) drawingGroup.Freeze();
+
+            var brush = new DrawingBrush(drawingGroup)
             {
                 TileMode = TileMode.Tile,
-                Viewport = new Rect(0, 0, spacing, spacing),
+                Viewport = tileRect,
                 ViewportUnits = BrushMappingMode.Absolute,
-                Viewbox = new Rect(0, 0, spacing, spacing),
+                Viewbox = tileRect,
                 ViewboxUnits = BrushMappingMode.Absolute,
-                Opacity = settings?.FillOpacity ?? 0.3
+                Stretch = Stretch.None
             };
-            brush.RelativeTransform = new RotateTransform(angle, 0.5, 0.5);
+
+            var rotation = new RotateTransform(angle, 0.5, 0.5);
+            if (rotation.CanFreeze) rotation.Freeze();
+            brush.RelativeTransform = rotation;
+
+            if (brush.CanFreeze) brush.Freeze();
+
             return brush;
         }
 

@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -108,6 +109,10 @@ namespace Osadka.ViewModels
                 VectorSettings.Version++;
             };
 
+            VectorSettings.CycleStyles.CollectionChanged += OnCycleStylesCollectionChanged;
+            foreach (var style in VectorSettings.CycleStyles)
+                SubscribeCycleStyle(style);
+
             if (Objects.Count > 0) SelectedObject = Objects[0];
             RebuildCycles();
             RebuildRows();
@@ -145,6 +150,37 @@ namespace Osadka.ViewModels
             RebuildRows();
             RowsView.Refresh();
             RebuildCycleOverlays();
+        }
+
+        private void OnCycleStylesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems != null)
+                foreach (CycleStyle style in e.OldItems.OfType<CycleStyle>())
+                    style.PropertyChanged -= OnCycleStylePropertyChanged;
+
+            if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                foreach (var style in VectorSettings.CycleStyles)
+                    SubscribeCycleStyle(style);
+            }
+            else if (e.NewItems != null)
+            {
+                foreach (CycleStyle style in e.NewItems.OfType<CycleStyle>())
+                    SubscribeCycleStyle(style);
+            }
+
+            VectorSettings.Version++;
+        }
+
+        private void SubscribeCycleStyle(CycleStyle style)
+        {
+            style.PropertyChanged -= OnCycleStylePropertyChanged;
+            style.PropertyChanged += OnCycleStylePropertyChanged;
+        }
+
+        private void OnCycleStylePropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            VectorSettings.Version++;
         }
 
         private void SubscribeCycleToggle(CycleToggle ct)
