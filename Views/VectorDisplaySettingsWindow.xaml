@@ -144,7 +144,9 @@
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <CheckBox Content="Один цвет для всех" IsChecked="{Binding VectorSettings.UseSingleColor, Mode=TwoWay}"/>
-                            <Rectangle Width="24" Height="18" Stroke="Black" Margin="12,2,6,0" Fill="{Binding VectorSettings.SingleColor}"/>
+                            <Button Width="24" Height="18" Margin="12,2,6,0" Padding="0" BorderBrush="Black" BorderThickness="1"
+                                    Background="{Binding VectorSettings.SingleColor}" ToolTip="Выбрать цвет"
+                                    Click="OnSelectSingleColorClick"/>
                             <TextBox Width="90" Text="{Binding VectorSettings.SingleColor, Mode=TwoWay, Converter={StaticResource ColorToHex}}"/>
                         </StackPanel>
 
@@ -156,7 +158,9 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
-                                                <Rectangle Width="24" Height="18" Stroke="Black" Margin="0,0,6,0" Fill="{Binding Color}"/>
+                                                <Button Width="24" Height="18" Margin="0,0,6,0" Padding="0" BorderBrush="Black" BorderThickness="1"
+                                                        Background="{Binding Color}" ToolTip="Выбрать цвет"
+                                                        Click="OnSelectCycleColorClick"/>
                                                 <TextBox Width="90" Text="{Binding Color, Mode=TwoWay, Converter={StaticResource ColorToHex}}"/>
                                             </StackPanel>
                                         </DataTemplate>
