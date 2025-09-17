@@ -3,7 +3,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -28,6 +30,7 @@ namespace Osadka.ViewModels
         public ObservableCollection<CycleToggle> Cycles { get; } = new();
 
         public VectorDisplaySettings VectorSettings { get; } = new();
+        private readonly HashSet<CycleStyle> _subscribedCycleStyles = new();
 
         [ObservableProperty] private ArrowDisplayMode displayMode = ArrowDisplayMode.SelectedCycles;
 
@@ -108,6 +111,10 @@ namespace Osadka.ViewModels
                 VectorSettings.Version++;
             };
 
+            foreach (var style in VectorSettings.CycleStyles)
+                SubscribeCycleStyle(style);
+            VectorSettings.CycleStyles.CollectionChanged += OnCycleStylesCollectionChanged;
+
             if (Objects.Count > 0) SelectedObject = Objects[0];
             RebuildCycles();
             RebuildRows();
@@ -159,6 +166,50 @@ namespace Osadka.ViewModels
                     RebuildCycleOverlays();
                 }
             };
+        }
+
+        private void SubscribeCycleStyle(CycleStyle style)
+        {
+            if (style == null) return;
+            if (_subscribedCycleStyles.Add(style))
+                style.PropertyChanged += OnCycleStylePropertyChanged;
+        }
+
+        private void UnsubscribeCycleStyle(CycleStyle style)
+        {
+            if (style == null) return;
+            if (_subscribedCycleStyles.Remove(style))
+                style.PropertyChanged -= OnCycleStylePropertyChanged;
+        }
+
+        private void OnCycleStylesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                foreach (var style in _subscribedCycleStyles.ToArray())
+                    UnsubscribeCycleStyle(style);
+                foreach (var style in VectorSettings.CycleStyles)
+                    SubscribeCycleStyle(style);
+                VectorSettings.Version++;
+                return;
+            }
+
+            if (e.OldItems != null)
+                foreach (var style in e.OldItems.OfType<CycleStyle>())
+                    UnsubscribeCycleStyle(style);
+
+            if (e.NewItems != null)
+                foreach (var style in e.NewItems.OfType<CycleStyle>())
+                    SubscribeCycleStyle(style);
+
+            if (e.Action != NotifyCollectionChangedAction.Move)
+                VectorSettings.Version++;
+        }
+
+        private void OnCycleStylePropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(CycleStyle.Color))
+                VectorSettings.Version++;
         }
 
         public string SelectedCyclesSummary
